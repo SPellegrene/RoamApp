@@ -1,9 +1,13 @@
 import React, { Component } from 'react';
-import { AppRegistry, StyleSheet, Text, View, Image, TextInput } from 'react-native';
+import { AppRegistry, StyleSheet, Text, View, Image, TextInput, Dimensions } from 'react-native';
 import { createRouter, NavigationProvider, StackNavigation } from '@exponent/ex-navigation';
 import Button from 'react-native-button';
 import Router from './Router';
+import MapPage from './MapPage';
 
+
+const width = Dimensions.get('window').width; //full width
+const height = Dimensions.get('window').height; //full height
 
 export default class HomePage extends Component {
 
@@ -14,18 +18,21 @@ export default class HomePage extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      text: ''
-    };
+      value:'',
+    }
   }
 
-  _goToMap() {
-  this.props.navigator.push(Router.getRoute('map'));
-  // console.log(this.props);
+  goToMap() {
+    if (this.state.value === '' || this.state.value === null || this.state.value === 'undefined'){
+      alert('Please Go Back and Enter City');
+    }
+    //pushes to map page and renders the inputted value
+    this.props.navigator.push(Router.getRoute('map',{city: this.state.value}));
   }
 
   render() {
     return (
-      <View>
+      <View style={styles.mainContainer}>
         <View style={styles.viewStyling}>
           <Image className="LandingImg"
             source={require('./hiker.jpg')}
@@ -38,14 +45,15 @@ export default class HomePage extends Component {
           <TextInput
             style={styles.textInput}
             placeholder='Enter City'
-            onChangeText={(text) => this.setState({text})}
+            onChangeText={(value) => this.setState({value})}
+            value={this.state.city}
           />
         </View>
         <View style={styles.goButton}>
           <Button
             style={styles.buttonStyling}
             styleDisabled={{color: 'red'}}
-            onPress={this._goToMap.bind(this)}>Go
+            onPress={this.goToMap.bind(this)}>Go
           </Button>
         </View>
       </View>
@@ -54,6 +62,10 @@ export default class HomePage extends Component {
 }
 
 const styles = StyleSheet.create({
+
+  mainContainer: {
+    justifyContent:'center',
+  },
 
   viewStyling: {
     flexDirection:'column',
@@ -66,7 +78,6 @@ const styles = StyleSheet.create({
     fontSize:32,
     color:'#E2E2E2',
     fontWeight: '300'
-    // fontFamily:'Abel'
   },
 
   sloganStyling: {
@@ -90,35 +101,35 @@ const styles = StyleSheet.create({
   },
 
   textInput: {
-    height:49,
-    // borderWidth:1,
-    // borderColor:'#CACBCC',
+    height:40,
     borderRadius: 5,
-    width:158,
+    width:170,
     textAlign: 'center',
-    // marginLeft: 110,
     backgroundColor:'#F0F0F0',
+
   },
 
   goButton: {
-    flexDirection:'row',
-    justifyContent:'center',
-    marginTop:-49,
-    marginLeft:210,
-    backgroundColor:'transparent'
-
+    alignItems:'center',
+    marginTop:360,
+    // marginLeft:220,
+    backgroundColor:'transparent',
+    width:width,
+    height:70,
   },
 
   buttonStyling: {
     position:'relative',
-    marginTop:3,
-    height: 41,
-    width: 49,
     textAlign:'center',
-    fontSize:30,
+    fontSize:32,
     color:'#C7C9CB',
     borderRadius: 5,
     fontWeight: '200',
-    marginLeft:5,
+    borderWidth:1,
+    borderColor:'#E2E2E2',
+    width:80,
+    height:60,
+    padding:10
+    // width:100
   }
 });

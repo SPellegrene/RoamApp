@@ -4,49 +4,57 @@ import axios from 'axios';
 import Button from 'react-native-button';
 import MapView from 'react-native-maps';
 import MapWrapper from './MapWrapper';
-
+import HomePage from './HomePage';
 let id=0;
 
-class MapPage extends React.Component {
+export default class MapPage extends React.Component {
   constructor(props) {
     super(props);
 
     this.state = {
-      markers: [],
-      data: this.props.data,
-      center:[0,0]
+      church: this.props.church,
+      center:[0,1],
+      markers:[]
     };
-
-    this.onMapPress = this.onMapPress.bind(this);
   }
 
   componentDidMount() {
-    this.getData()
     this.getCenter()
+    this.getChurch()
   }
 
-  getData() {
-    axios.get("https://api.mapbox.com/geocoding/v5/mapbox.places/minneapolis.json?access_token=sk.eyJ1Ijoic3BlbGxlZ3JlbmUiLCJhIjoiY2l4Z2prNjdvMDAxcDJ0dzNzYTZ5d284biJ9.ipSnbxgYgLiMmbSUNUJVcQ")
-    .then((response)=> {
-      let newData = response.data.features[0];
-      this.setState({
-        data: newData
-      })
-      console.log(newData);
-    })
-    .catch(function (error) {
-      console.log(error);
-    })
-  }
-
+  //request to get the two center coordinates from api
   getCenter() {
-    axios.get("https://api.mapbox.com/geocoding/v5/mapbox.places/minneapolis.json?access_token=sk.eyJ1Ijoic3BlbGxlZ3JlbmUiLCJhIjoiY2l4Z2prNjdvMDAxcDJ0dzNzYTZ5d284biJ9.ipSnbxgYgLiMmbSUNUJVcQ")
+    console.log(this.props.route.params.city);
+    axios.get("https://api.mapbox.com/geocoding/v5/mapbox.places/" + this.props.route.params.city + ".json?access_token=sk.eyJ1Ijoic3BlbGxlZ3JlbmUiLCJhIjoiY2l4Z2prNjdvMDAxcDJ0dzNzYTZ5d284biJ9.ipSnbxgYgLiMmbSUNUJVcQ")
     .then((response)=> {
       let newCenter = response.data.features[0].center.slice(0);
       this.setState({
-        center: newCenter
+        center: newCenter,
+        newItemValue: ''
       })
       console.log(newCenter);
+    })
+  }
+
+  //get religious and other category from object
+  getChurch() {
+    axios.get("https://api.mapbox.com/geocoding/v5/mapbox.places/"+ this.props.route.params.city + ".json?access_token=sk.eyJ1Ijoic3BlbGxlZ3JlbmUiLCJhIjoiY2l4Z2prNjdvMDAxcDJ0dzNzYTZ5d284biJ9.ipSnbxgYgLiMmbSUNUJVcQ")
+    .then((response)=> {
+      let newChurch = response.data.features[0].properties.category;
+
+      //recognize when something searched is a place of worship
+      if (newChurch === 'religious' || newChurch=== 'other'){
+        alert('you got a church!')
+      }
+
+      this.setState({
+        church: newChurch
+      })
+      console.log(newChurch);
+    })
+    .catch(function (error) {
+      console.log(error);
     })
   }
 
@@ -55,27 +63,15 @@ class MapPage extends React.Component {
     this.props.navigator.pop();
   }
 
-  //place marker functionality
-  onMapPress(e) {
-    this.setState({
-      markers: [
-        this.state.markers,
-        {
-          coordinate: e.nativeEvent.coordinate,
-          key: `foo${id++ }`,
-        },
-      ],
-    });
-  }
 
   render() {
     return (
       <View style={styles.container}>
-        <MapWrapper markers={this.state.markers} center={this.state.center}/>
+        <MapWrapper center={this.state.center}/>
+        {/* <Markers markers={this.state.markers} /> */}
             {/* Renders Map */}
         <View style={styles.buttonContainer}>
           <TouchableOpacity
-            // onPress={() => this.setState({ markers: [] })}
             style={styles.bubble}
           >
         <Button
@@ -85,6 +81,7 @@ class MapPage extends React.Component {
         </Button>
           </TouchableOpacity>
         </View>
+
       </View>
     );
   }
@@ -126,5 +123,3 @@ const styles = StyleSheet.create({
     backgroundColor: 'transparent',
   },
 });
-
-module.exports = MapPage;

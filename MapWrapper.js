@@ -1,75 +1,110 @@
-import React from 'react';
+import React, { Component } from 'react';
 import { StyleSheet, View, Text, Dimensions, TouchableOpacity } from 'react-native';
 import MapView from 'react-native-maps';
 import MarkerImg from './markerlg.png';
 
-const { width, height } = Dimensions.get('window');
-const ASPECT_RATIO = width / height;
-const LATITUDE_DELTA = 0.0922;
-const LONGITUDE_DELTA = LATITUDE_DELTA * ASPECT_RATIO;
+// import Markers from './Markers';
 
+const LONGITUDE_DELTA = LATITUDE_DELTA * ASPECT_RATIO;
+const LATITUDE_DELTA= 0.0922;
+const ASPECT_RATIO = width / height;
+const { width, height } = Dimensions.get('window');
+let id =0;
+
+function randomColor() {
+  return `#${Math.floor(Math.random() * 16777215).toString(16)}`;
+}
 
 export default class MapWrapper extends React.Component {
 
   constructor(props){
     super(props);
-    this.state= {
-      latitude: 0,
-      longitude: 1,
-      latitudeDelta: LATITUDE_DELTA,
-      longitudeDelta: LONGITUDE_DELTA,
+    this.state = {
+      region:{
+        latitude:this.props.center[1],
+        longitude:this.props.center[0],
+    },
+      markers: []
     }
   }
 
-  componentWillReceiveProps(newProps){
-    console.log(newProps);
+  componentDidMount(){
     this.setState({
-      latitude:newProps.center[0],
-      longitude:newProps.center[1],
-      latitudeDelta: LATITUDE_DELTA,
-      longitudeDelta: LONGITUDE_DELTA,
+      latitudeDelta: .0922,
+      longitudeDelta: .0922
+      // latitude:this.props.center[1],
+      // longitude:this.props.center[0],
     })
-
+    console.log(this.props.center)
   }
 
-  // setRegion(lat, long){
+  // componentWillReceiveProps(newProps){
+  //   this.setState({
+  //     latitude:newProps.center[1],
+  //     longitude:newProps.center[0],
+  //     latitudeDelta: .092,
+  //     longitudeDelta: .092
+  //   })
   //   console.log(this.props.center)
   // }
 
+//   onRegionChange(region) {
+//   this.setState({ this.state.region })
+// }
+
+onMapChange(e) {
+  console.log('Pressed!')
+    // this.setState({
+    //   markers: [
+    //     ...this.state.markers,
+    //     {
+    //       coordinate: e.nativeEvent.coordinate,
+    //       key: `foo$1 {id++}`,
+    //       color: randomColor(),
+    //     },
+    //   ],
+    // });
+  }
 
 
   render(){
     return(
-
       <MapView
-        provider={this.props.provider}
-        style={styles.map}
-        initialRegion={{
-          latitude: this.state.latitude,
-          longitude: this.state.longitude,
-          latitudeDelta: this.state.latitudeDelta,
-          longitudeDelta: this.state.longitudeDelta
-        }}
-        onPress={this.onMapPress}
-      >
+          provider={this.props.provider}
+          style={styles.map}
+          region={{
+            latitude: this.props.center[1],
+            longitude: this.props.center[0],
+            latitudeDelta: this.state.latitudeDelta,
+            longitudeDelta: this.state.longitudeDelta
+          }}
+        >
 
-          {/* Renders Marker */}
-      {this.props.markers.map(marker => (
-        <MapView.Marker
-          title={marker.key}
-          image={MarkerImg}
-          key={marker.id}
-          coordinate={marker.coordinate}
-        />
-        ))}
+        <MapView
+          region={this.state.region}
+          onRegionChange={this.onRegionChange}
+        >
+          {this.state.markers.map(marker => (
+            <MapView.Marker
+              coordinate={marker.latlng}
+              image={MarkerImg}
+              pinColor={marker.color}
+            />
+          ))}
+        </MapView>
+
       </MapView>
-
     )
   }
 }
-const styles = StyleSheet.create({
 
-  map: {
-    ...StyleSheet.absoluteFillObject
-  }
-})
+MapWrapper.propTypes = {
+  provider: MapView.ProviderPropType,
+};
+
+  const styles = StyleSheet.create({
+
+    map: {
+      ...StyleSheet.absoluteFillObject
+    }
+  })
