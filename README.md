@@ -21,7 +21,7 @@ To provide accurate information for all those seeking to find a place of worship
 * Flexbox (responsive design)
 
 
-###### About the Developer
+###### About the Developer - Sam Pellegrene
 ![](personal.JPG)
 
 
