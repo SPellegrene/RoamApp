@@ -5,22 +5,24 @@ import Button from 'react-native-button';
 import MapView from 'react-native-maps';
 import MapWrapper from './MapWrapper';
 import HomePage from './HomePage';
-let id=0;
 
 export default class MapPage extends React.Component {
   constructor(props) {
     super(props);
 
     this.state = {
-      church: this.props.church,
+      churches: [],
       center:[0,1],
-      markers:[]
+      markers:[],
+      coordinates:[0,1],
+      description: [],
+      id:''
     };
   }
 
   componentDidMount() {
     this.getCenter()
-    this.getChurch()
+    // this.getChurches()
   }
 
   //request to get the two center coordinates from api
@@ -28,30 +30,36 @@ export default class MapPage extends React.Component {
     console.log(this.props.route.params.city);
     axios.get("https://api.mapbox.com/geocoding/v5/mapbox.places/" + this.props.route.params.city + ".json?access_token=sk.eyJ1Ijoic3BlbGxlZ3JlbmUiLCJhIjoiY2l4Z2prNjdvMDAxcDJ0dzNzYTZ5d284biJ9.ipSnbxgYgLiMmbSUNUJVcQ")
     .then((response)=> {
+
       let newCenter = response.data.features[0].center.slice(0);
+      let longLatCoordinates = newCenter;
+      let latLongCoordinates = [longLatCoordinates[1], longLatCoordinates[0]];
       this.setState({
         center: newCenter,
-        newItemValue: ''
+        newItemValue: '',
+        coordinates:latLongCoordinates
       })
-      console.log(newCenter);
-    })
-  }
+      // console.log(latLongCoordinates);
 
-  //get religious and other category from object
-  getChurch() {
-    axios.get("https://api.mapbox.com/geocoding/v5/mapbox.places/"+ this.props.route.params.city + ".json?access_token=sk.eyJ1Ijoic3BlbGxlZ3JlbmUiLCJhIjoiY2l4Z2prNjdvMDAxcDJ0dzNzYTZ5d284biJ9.ipSnbxgYgLiMmbSUNUJVcQ")
-    .then((response)=> {
-      let newChurch = response.data.features[0].properties.category;
-
-      //recognize when something searched is a place of worship
-      if (newChurch === 'religious' || newChurch=== 'other'){
-        alert('you got a church!')
-      }
-
-      this.setState({
-        church: newChurch
+      axios.get("https://maps.googleapis.com/maps/api/place/nearbysearch/json?radius=8000&location=" + this.state.coordinates + "&type=church&key=AIzaSyC58lupmo-uAjtVGJG_aBA3MM5HavebiR0")
+      .then((response)=> {
+        console.log(response.data);
+        let newChurches = response.data.results;
+        console.log(newChurches);
+        this.setState({
+          churches: newChurches
+        })
       })
-      console.log(newChurch);
+
+      axios.get("https://maps.googleapis.com/maps/api/place/nearbysearch/json?radius=8000&location=" + this.state.coordinates + "&type=church&key=AIzaSyC58lupmo-uAjtVGJG_aBA3MM5HavebiR0")
+      .then((response)=> {
+        console.log(response.data);
+        let newID = response.data.results[0].place_id;
+        console.log(newID);
+        this.setState({
+          id: newID
+        })
+      })
     })
     .catch(function (error) {
       console.log(error);
@@ -65,10 +73,9 @@ export default class MapPage extends React.Component {
 
 
   render() {
-    return (
+    return(
       <View style={styles.container}>
-        <MapWrapper center={this.state.center}/>
-        {/* <Markers markers={this.state.markers} /> */}
+        <MapWrapper center={this.state.center} churches={this.state.churches} description={this.state.description}/>
             {/* Renders Map */}
         <View style={styles.buttonContainer}>
           <TouchableOpacity

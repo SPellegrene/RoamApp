@@ -1,19 +1,20 @@
 import React, { Component } from 'react';
 import { StyleSheet, View, Text, Dimensions, TouchableOpacity } from 'react-native';
 import MapView from 'react-native-maps';
-import MarkerImg from './markerlg.png';
+import MarkerImg from './church.png';
+import MapPage from './MapPage';
+import axios from 'axios';
+import ChurchDetail from './ChurchDetail';
 
 // import Markers from './Markers';
 
 const LONGITUDE_DELTA = LATITUDE_DELTA * ASPECT_RATIO;
 const LATITUDE_DELTA= 0.0922;
+// const LONGITUDE=
+// const LATITUDE= ;
 const ASPECT_RATIO = width / height;
 const { width, height } = Dimensions.get('window');
-let id =0;
 
-function randomColor() {
-  return `#${Math.floor(Math.random() * 16777215).toString(16)}`;
-}
 
 export default class MapWrapper extends React.Component {
 
@@ -23,47 +24,39 @@ export default class MapWrapper extends React.Component {
       region:{
         latitude:this.props.center[1],
         longitude:this.props.center[0],
+        latitudeDelta:LATITUDE_DELTA,
+        longitudeDelta: LONGITUDE_DELTA,
     },
-      markers: []
+    center: {
+        latitude: this.props.center[1],
+        longitude: this.props.center[0],
+      },
+      markers: null,
+      churches: this.props.churches,
+      description: this.props.description
     }
   }
 
   componentDidMount(){
     this.setState({
       latitudeDelta: .0922,
-      longitudeDelta: .0922
-      // latitude:this.props.center[1],
-      // longitude:this.props.center[0],
+      longitudeDelta: .0922,
     })
-    console.log(this.props.center)
+    // console.log(this.props.center)
+    // console.log(this.props.churches)
   }
 
-  // componentWillReceiveProps(newProps){
-  //   this.setState({
-  //     latitude:newProps.center[1],
-  //     longitude:newProps.center[0],
-  //     latitudeDelta: .092,
-  //     longitudeDelta: .092
-  //   })
-  //   console.log(this.props.center)
-  // }
+  componentWillReceiveProps(nextProps){
+    this.setState({
+      churches: nextProps.churches,
+      description: nextProps.description
+    })
+    console.log(nextProps.churches);
+    console.log(nextProps.description);
+  }
 
-//   onRegionChange(region) {
-//   this.setState({ this.state.region })
-// }
-
-onMapChange(e) {
-  console.log('Pressed!')
-    // this.setState({
-    //   markers: [
-    //     ...this.state.markers,
-    //     {
-    //       coordinate: e.nativeEvent.coordinate,
-    //       key: `foo$1 {id++}`,
-    //       color: randomColor(),
-    //     },
-    //   ],
-    // });
+  phonePress(){
+    console.log('Pressed!');
   }
 
 
@@ -79,19 +72,37 @@ onMapChange(e) {
             longitudeDelta: this.state.longitudeDelta
           }}
         >
+         {/*Marker Rendering*/}
+         {this.props.churches.length === 0 ? null: this.state.churches.map((church) => {
+           return (
+           <MapView.Marker
+          //  onPress={() => this.show()}
+           key = {church.id}
+           coordinate= {{
+             latitude: church.geometry.location.lat,
+             longitude: church.geometry.location.lng,
+             latitudeDelta: this.state.latitudeDelta,
+             longitudeDelta: this.state.longitudeDelta
+           }}
+           image={MarkerImg}>
 
-        <MapView
-          region={this.state.region}
-          onRegionChange={this.onRegionChange}
-        >
-          {this.state.markers.map(marker => (
-            <MapView.Marker
-              coordinate={marker.latlng}
-              image={MarkerImg}
-              pinColor={marker.color}
-            />
-          ))}
-        </MapView>
+           <MapView.Callout style={styles.calloutCont} onPress={this.phonePress.bind(this)}>
+
+              {/* <View style={[styles.container, this.props.style]}>
+              <View style={styles.bubble}>
+                <View style={styles.amount}> */}
+                <ChurchDetail church={church}  style={styles.churchDetail}/>
+                {/* </View>
+              </View>
+              <View style={styles.arrowBorder} />
+              <View style={styles.arrow} />
+              </View> */}
+
+            </MapView.Callout>
+
+           </MapView.Marker>
+         )
+         })}
 
       </MapView>
     )
@@ -99,12 +110,53 @@ onMapChange(e) {
 }
 
 MapWrapper.propTypes = {
-  provider: MapView.ProviderPropType,
+  provider: MapView.ProviderPropType
 };
 
   const styles = StyleSheet.create({
 
     map: {
       ...StyleSheet.absoluteFillObject
-    }
-  })
+    },
+
+  //   customView: {
+  //   width: 240,
+  //   height: 100,
+  // },
+    calloutCont: {
+      height:250,
+      width:250
+    },
+
+    bubble: {
+    width: 140,
+    flexDirection: 'row',
+    alignSelf: 'flex-start',
+    backgroundColor: '#005371',
+    paddingHorizontal: 20,
+    paddingVertical: 12,
+    borderRadius: 6,
+    borderColor: '#007a87',
+    borderWidth: 0.5,
+  },
+  amount: {
+    flex: 1,
+  },
+  arrow: {
+    backgroundColor: 'transparent',
+    borderWidth: 16,
+    borderColor: 'transparent',
+    borderTopColor: '#4da2ab',
+    alignSelf: 'center',
+    marginTop: -32,
+  },
+  arrowBorder: {
+    backgroundColor: 'transparent',
+    borderWidth: 16,
+    borderColor: 'transparent',
+    borderTopColor: '#007a87',
+    alignSelf: 'center',
+    marginTop: -0.5,
+  }
+
+})
