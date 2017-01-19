@@ -1,6 +1,6 @@
 # roam
 ### A church finding app
-![](Roam-ReadMe-Gif.gif)
+![](roam-gif.gif)
 
 ###### How it works!
 Simply enter in your current city and let the roam app find all Christian churches within a 10 mile radius.
