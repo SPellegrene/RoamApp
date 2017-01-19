@@ -1,12 +1,12 @@
 # roam
 ### A church finding app
-![](Roam-ReadMe-Gif.gif)
+!(http://www.giphy.com/gifs/d1E2NkOxrXiFVunK)
 
 ###### How it works!
 Simply enter in your current city and let the roam app find all Christian churches within a 10 mile radius.
 
 ###### About
-The roam app is a church finding app built for the traveling Christian. Created and developed by [Sam Pellegrene]('http://sammypelly.com/'), the roam app allows users to find churches near them from anywhere in the world.
+The roam app is a church finding app built for the traveling Christian. Created and developed by [Sam Pellegrene](http://sammypelly.com/), the roam app allows users to find churches near them from anywhere in the world.
 Once a user finds a church, they are given the phone number, address, and website link to ensure they have all the information they need.
 
 ###### Mission
