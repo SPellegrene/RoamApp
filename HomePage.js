@@ -110,11 +110,11 @@ const styles = StyleSheet.create({
   },
 
   goButton: {
-    alignItems:'center',
+    alignSelf:'center',
     marginTop:325,
     // marginLeft:220,
     backgroundColor:'transparent',
-    width:width,
+    width:70,
     height:70,
   },
 
